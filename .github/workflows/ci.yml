@@ -1,0 +1,91 @@
+# libjstd CI（Linux + Windows）
+#
+# 范围：libjstd + libjstd_unittest（纯 C++ 单测，期望值为预生成常量，
+# 无需 JDK）。依赖：luiox-repo git 直连包（libca）由 CI 显式注册（与根
+# xmake.lua 的声明幂等同源）；gtest 走 xrepo。模式对齐 luiox/libjbc/mjt 仓 CI。
+
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test-linux:
+    name: build & test (linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: v3.0.9
+          actions-cache-folder: '.xmake-cache'
+
+      - name: Cache xrepo packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.xmake/packages
+            ~/.local/share/xmake
+          key: libjstd-xrepo-linux-x64-xmake309-${{ hashFiles('xmake.lua') }}
+          restore-keys: |
+            libjstd-xrepo-linux-x64-xmake309-
+
+      - name: Register luiox-repo
+        run: xmake repo --add luiox-repo https://github.com/luiox/luiox-repo.git
+
+      - name: Configure (with tests)
+        run: xmake f -p linux --with_tests=y -y
+
+      - name: Build tests
+        run: xmake build -y libjstd_unittest
+
+      - name: Run unit tests
+        run: xmake run libjstd_unittest --gtest_brief=1
+
+  build-and-test-windows:
+    name: build & test (windows)
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: v3.0.9
+          actions-cache-folder: '.xmake-cache'
+
+      - name: Cache xrepo packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/AppData/Local/.xmake/packages
+          key: libjstd-xrepo-windows-x64-xmake309-${{ hashFiles('xmake.lua') }}
+          restore-keys: |
+            libjstd-xrepo-windows-x64-xmake309-
+
+      - name: Register luiox-repo
+        shell: bash
+        run: xmake repo --add luiox-repo https://github.com/luiox/luiox-repo.git
+
+      - name: Configure (with tests)
+        shell: bash
+        run: xmake f -p windows --with_tests=y -y
+
+      - name: Build tests
+        shell: bash
+        run: xmake build -y libjstd_unittest
+
+      - name: Run unit tests
+        shell: bash
+        run: xmake run libjstd_unittest --gtest_brief=1
