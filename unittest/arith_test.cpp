@@ -66,7 +66,7 @@ TEST(JstdArith, AbsJavaSemantics)
 {
     EXPECT_EQ(arith::abs(5), 5);
     EXPECT_EQ(arith::abs(-5), 5);
-    EXPECT_EQ(arith::abs(INT32_MIN), INT32_MIN);   // Math.abs 不回绕
+    EXPECT_EQ(arith::abs(INT32_MIN), INT32_MIN);   // Math.abs(MIN_VALUE) 亦为 MIN_VALUE（JDK 文档行为）
 }
 
 // ── 移位（掩码取模 + 算术/逻辑右移）───────────────────────────────

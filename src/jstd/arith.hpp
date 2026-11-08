@@ -6,7 +6,7 @@ namespace jstd {
 
 ///@brief Java 32/64 位整数运算语义（C++ 侧唯一权威实现）。
 ///
-///对齐 JVM 行为（`doc/design` 各分析文档）：有符号整数**溢出回绕**（C++ 有符号
+///对齐 JVM 行为：有符号整数**溢出回绕**（C++ 有符号
 ///溢出是 UB，这里用无符号位运算规避）、除法**向零截断**、取模**符号跟随被除数**
 ///（C++11 起与 Java 一致）、移位**掩码取模**（`& 0x1F` / `& 0x3F`）、
 ///窄化转换（i2b/i2c/i2s/l2i 取低位位模式）。
@@ -43,7 +43,7 @@ inline ca::i32 div(ca::i32 a, ca::i32 b) noexcept
     return a / b;
 }
 
-///取模（符号跟随被除数）；INT_MIN % -1 == 0（Java 语义：分子为 0）。
+///取模（符号跟随被除数）；INT_MIN % -1 == 0（JLS：结果为 a - (a/b)*b，此特例为 0）。
 inline ca::i32 rem(ca::i32 a, ca::i32 b) noexcept
 {
     if (a == INT32_MIN && b == -1) return 0;
@@ -56,7 +56,7 @@ inline ca::i32 neg(ca::i32 a) noexcept
     return static_cast<ca::i32>(0U - static_cast<ca::u32>(a));
 }
 
-///`Math.abs`：INT_MIN -> INT_MIN（Java 不回绕）。
+///`Math.abs`：INT_MIN -> INT_MIN（Java `Math.abs` 对 MIN_VALUE 同样返回负值，不抛异常）。
 inline ca::i32 abs(ca::i32 a) noexcept
 {
     return a == INT32_MIN ? INT32_MIN : (a < 0 ? -a : a);
