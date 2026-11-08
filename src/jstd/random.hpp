@@ -9,8 +9,7 @@ namespace jstd {
 ///对齐 JDK 语义（legacy LCG 分支）：multiplier 0x5DEECE66D、addend 0xB、
 ///mask (1<<48)-1；`new Random(seed)` 做 `seed ^ multiplier` scramble。
 ///`nextInt(bound)` 含拒绝采样（非 2 的幂 bound 的 JDK 有符号判定），
-///`nextFloat`/`nextDouble` 与 JDK 除法逐位一致。C++ 侧唯一权威实现
-///（原散落于各模块 intrinsic_folding / key_codec 等处的复刻已收敛于此）。
+///`nextFloat`/`nextDouble` 与 JDK 除法逐位一致。C++ 侧唯一权威实现。
 ///
 ///非线程安全（对齐 JDK 核心 `next` 无内部同步）。
 class Random
