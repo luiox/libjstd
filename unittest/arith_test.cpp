@@ -148,7 +148,7 @@ TEST(JstdArith, I64ShiftsMaskBy63)
     EXPECT_EQ(arith::ushr(INT64_MIN, 63), 1);
 }
 
-// ── Java 与 C++ 行为对照（对拍点，非权威——权威为 JVM fixture）─────
+// Java 与 C++ 行为对照（对拍点，非权威，权威为 JVM fixture）
 
 TEST(JstdArith, MixedRoundTripAgainstKnownValues)
 {
